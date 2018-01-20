@@ -31,16 +31,26 @@
         .sort((a, b) => b.population - a.population);
     }
 
-    function showCities(event) {
-      const matching = matchCities(event.target.value);
-      let newList = document.createElement('ul');
-      newList.classList.add('suggestions');
-      for (city of matching) {
-        let item = document.createElement('li');
-        item.innerHTML = `${city.city}, ${city.state}`;
-        newList.appendChild(item);
-      }
-      document.querySelector('.suggestions').replaceWith(newList);
+    function cityHTML(city, state, population) {
+      return `<li>
+        <span class="name">${city}, ${state}</span>
+        <span class="population">${population}</span>
+      </li>`;
+    }
+
+    function highlight(text, querystring) {
+      const query = RegExp(querystring, 'gi');
+      return text.replace(query, '<span class="hl">$&</span>')
+    }
+
+    function highlightedCity(place, querystring) {
+      return cityHTML(highlight(place.city, querystring), highlight(place.state, querystring), place.population);
+    }
+
+    function showCities() {
+      const query = this.value;
+      const cityList = matchCities(query).map(city => highlightedCity(city, query)).join('');
+      document.querySelector('.suggestions').innerHTML = cityList;
     }
 
     document.querySelector('.search').addEventListener('change', showCities);
